@@ -1,0 +1,265 @@
+<MaterialListItem>:
+    text_field: text_field
+
+    ImageLeftWidget:
+        pos_hint: {'center_x': 0.5,'y': -0.15}
+        size_hint_x: None
+        size_hint_y: None
+        width: 300
+        height: 100
+        ripple_alpha: 0
+
+        MDTextField:
+            id: text_field
+            helper_text: 'Количество (метры)'
+            input_type: 'number'
+            input_filter: 'float'
+            on_focus:
+                root.material.value = self.text
+
+            hint_text_color_normal:  (1, 0, 0, 1) if self.hint_text == 'Материал не найден' else (0, 0, 0, 0.7)
+
+    IconRightWidget:
+        icon: "delete"
+        on_release: app.main_scr.edit_product_screen.delete_material(root.material)
+
+<ListItem>:
+    IconRightWidget:
+        icon: "pencil"
+        on_release:
+            app.main_scr.edit_item_screen(root.item)
+            app.main_scr.update_materials()
+
+<EditMaterialScreen>:
+    name: 'edit_material_screen'
+
+    name_textfield: name_textfield
+    price_textfield: price_textfield
+    count_textfield: count_textfield
+
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            id: appbar
+            title: 'Добавление материала'
+            md_bg_color: (.3,.3,.3)
+            left_action_items: [["keyboard-backspace", lambda x: app.main_scr.back_screen()]]
+            right_action_items: [['delete', lambda x: root.delete([app.main_scr.update_materials,app.main_scr.back_screen])]]
+
+        MDFloatLayout:
+            
+            MDBoxLayout:
+                orientation: 'vertical'
+                pos_hint: {'center_x': 0.5,'y': 0.5}
+                size_hint: 0.8, 0.6
+
+                MDTextField:
+                    id: name_textfield
+                    hint_text: 'Название'
+                    on_error: root.is_error = self.error
+                MDTextField:
+                    id: price_textfield
+                    input_filter: 'float'
+                    hint_text: 'Цена за метр (рубли)'
+                    max_text_length: 12
+                    on_error: root.is_error = self.error
+                MDTextField:
+                    id: count_textfield
+                    input_filter: 'int'
+                    hint_text: 'Закуплено (метры)'
+                    max_text_length: 12
+                    on_error: root.is_error = self.error
+
+                MDRoundFlatButton:
+                    text: 'Сохранить'
+                    pos_hint: {'center_x': 0.5,'center_y': 0.5}
+                    font_size: 24
+
+                    on_release:
+                        root.press_save_button(app.main_scr.back_screen)
+                        app.main_scr.update_materials()
+
+
+
+
+
+<EditProductScreen>:
+    name: 'edit_product_screen'
+    materials_list: materials_list
+
+    name_textfield: name_textfield
+    desire_price_textfield: desire_price_textfield
+    sell_count_textfield: sell_count_textfield
+
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            id: appbar
+            title: 'Добавление товара'
+            md_bg_color: (.3,.3,.3)
+            left_action_items: [["keyboard-backspace", lambda x: app.main_scr.back_screen()]]
+            right_action_items: [["alpha-m-box", lambda x: root.materials_menu.open(x)], ["delete", lambda x: root.delete([app.main_scr.update_products,app.main_scr.back_screen])]]
+
+        MDFloatLayout:
+            MDBoxLayout:
+                orientation: 'vertical'
+                pos_hint: {'center_x': 0.5,'y': 0.5}
+                size_hint: 0.8, 0.6
+
+                MDTextField:
+                    id: name_textfield
+                    hint_text: 'Название'
+                    on_error: root.is_error = self.error
+                MDTextField:
+                    id: desire_price_textfield
+                    input_type: 'number'
+                    input_filter: 'float'
+                    max_text_length: 12
+                    hint_text: 'Желаемая прибыль (рубли)'
+                    on_error: root.is_error = self.error
+                MDTextField:
+                    id: sell_count_textfield
+                    input_type: 'number'
+                    input_filter: 'int'
+                    max_text_length: 12
+                    hint_text: 'Количество продаж'
+                    on_error: root.is_error = self.error
+
+                MDRoundFlatButton:
+                    text: 'Сохранить'
+                    pos_hint: {'center_x': 0.5,'center_y': 0.5}
+                    font_size: 24
+                    on_release:
+                        root.press_save_button(app.main_scr.back_screen)
+                        app.main_scr.update_products()
+
+
+            MDFloatLayout:
+                MDScrollView:
+                    pos_hint: {'center_x': 0.5,'top': 0.48}
+                    size_hint_y: 0.48
+                    MDList:
+                        id: materials_list
+
+
+<MainScreen>:
+    nav_drawer: nav_drawer
+    screen_manager: screen_manager
+
+    materials_list: materials_list
+    products_list: products_list
+    edit_material_screen: edit_material_screen
+    edit_product_screen: edit_product_screen
+
+    data_table: data_table
+
+    MDNavigationLayout:
+        MDScreenManager:
+            id: screen_manager
+
+            MDScreen:
+                name: 'materials_screen'
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+
+                    MDTopAppBar:
+                        id: appbar
+                        title: 'Список Материалов'
+                        halign: 'left'
+                        md_bg_color: (0.2, 0.7, 0.2)
+                        left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+                        right_action_items: [["plus-box", lambda x: root.add_item_screen()]]
+
+                    MDScrollView:
+                        MDList:
+                            id: materials_list
+
+
+            MDScreen:
+                name: 'products_screen'
+                
+                MDBoxLayout:
+                    orientation: 'vertical'
+
+                    MDTopAppBar:
+                        id: appbar
+                        title: 'Список Товаров'
+                        halign: 'left'
+                        left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+                        right_action_items: [["plus-box", lambda x: root.add_item_screen()]]
+
+                    MDScrollView:
+                        pos_hint: {'center_x': 0.5,'top': 0.9}
+
+                        MDList:
+                            id: products_list
+
+            MDScreen:
+                name: 'table_screen'
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+
+                    MDTopAppBar:
+                        id: appbar
+                        title: 'Таблица Товаров'
+                        halign: 'left'
+                        left_action_items: [["menu", lambda x: nav_drawer.set_state('open')]]
+                    ProductDataTable:
+                        id: data_table
+
+            EditMaterialScreen:
+                id: edit_material_screen
+            EditProductScreen:
+                id: edit_product_screen
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            radius: (0, 20, 20, 0)
+
+            MDNavigationDrawerMenu:
+
+                MDNavigationDrawerHeader:
+                    title: "Разделы"
+                    text: "Выберите раздел:"
+                    text_color: (100, 100, 100)
+                    text_font_size: '14sp'
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+
+                MDNavigationDrawerItem:
+                    icon: "brightness-6"
+                    text: "Сменить тему"
+                    on_release:
+                        app.switch_theme()
+                        nav_drawer.set_state('close')
+
+                MDNavigationDrawerDivider:
+
+                MDNavigationDrawerItem:
+                    icon: "palette-swatch"
+                    text: "Список материалов"
+                    on_release:
+                        root.screen_manager.current = 'materials_screen'
+                        nav_drawer.set_state('close')
+                        appbar.title = self.text
+
+
+                MDNavigationDrawerItem:
+                    icon: "purse"
+                    text: "Список товаров"
+                    on_release:
+                        root.screen_manager.current = 'products_screen'
+                        nav_drawer.set_state('close')
+                        appbar.title = self.text
+
+                MDNavigationDrawerItem:
+                    icon: "table-large"
+                    text: "Таблица товаров"
+                    on_release:
+                        root.screen_manager.current = 'table_screen'
+                        nav_drawer.set_state('close')
+                        appbar.title = self.text
